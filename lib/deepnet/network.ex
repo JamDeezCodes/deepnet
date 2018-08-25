@@ -62,4 +62,25 @@ defmodule Deepnet.Network do
       }
       end, [name: __MODULE__])
   end
+  
+  @doc """
+  Get state of neural network
+  """
+  def get do
+  Agent.get(__MODULE__, &(&1))
+  end
+
+  def initialize_weights() do
+    :sfmt.seed(:os.timestamp)
+    network = Agent.get(__MODULE__, &(&1))
+    input_weights = Matrix.rand(network.input_nodes, network.hidden_nodes)
+
+    weights =
+      Matrix.sub(input_weights,
+        Matrix.new(network.input_nodes, network.hidden_nodes, 0.5))
+
+    Agent.get_and_update(__MODULE__, fn(map) -> 
+      {map, Map.put(map, :weights, weights)}
+    end)
+  end
 end
