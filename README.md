@@ -1,6 +1,6 @@
 # Deepnet
 
-**TODO: Add description**
+**Following along here: http://www.automatingthefuture.com/blog/2017/2/20/deep-learning-building-and-training-a-multi-layered-neural-network-in-elixir**
 
 ## Installation
 
