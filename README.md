@@ -19,3 +19,16 @@ Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_do
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at [https://hexdocs.pm/deepnet](https://hexdocs.pm/deepnet).
 
+## Steps
+
+To fire up the neural network, run:
+
+```iex -S mix```
+
+Then run this command to initialize the weights:
+
+```Deepnet.Network.initialize_weights```
+
+When you run the following command, you should see the network's randomized weights in the struct:
+
+```Deepnet.Network.get```
