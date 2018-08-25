@@ -9,7 +9,7 @@ defmodule Deepnet do
   """
 
   defstruct [
-    user_input[[1, 0, 0], [1, 0, 1]],
+    user_input: [[1, 0, 0], [1, 0, 1]],
     desired_target: [1, 1, 1]
   ]
 
