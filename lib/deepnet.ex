@@ -16,7 +16,6 @@ defmodule Deepnet do
   @doc """
   Starts DeepNet
   """
-
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
@@ -26,5 +25,21 @@ defmodule Deepnet do
 
     opts = [strategy: :one_for_one, name: Deepnet.Supervisor]
     Supervisor.start_link(children, opts)
+  end
+
+  defp learn(error_rate, data, epoch) when error_rate <= 0.02 do
+    Deepnet.Network.train(data.user_input, data.desired_target)
+    error_rate = Map.fetch!(Deepnet.Network.get(), :error_rate)
+    IO.puts("#{IO.ANSI.yellow} | EPOCH: #{epoch + 1} | ERROR RATE: #{error_rate}")
+    learn(error_rate, data, epoch + 1)
+  end
+
+  defp learn(error_rate, data, epoch) when error_rate >= 0.02 do
+    IO.puts("""
+      #{IO.ANSI.green}
+      Learned to achieve target #{inspect(data.desired_target)} in #{epoch} epochs.
+      Network operated with user inputs #{inspect(data.user_input)}.
+      The final ERROR RATE for the network is #{error_rate}.
+    """)
   end
 end
