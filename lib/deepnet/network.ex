@@ -90,18 +90,28 @@ defmodule Deepnet.Network do
       Matrix.sub(output, network.target)
       |> List.flatten
       |> Numerix.LinearAlgebra.dot_product(List.flatten(input))
-    gradient = pmap(List.flatten(output), fn(calc) -> [calc * delta * network.learning_rate] end)
+    gradient = parallel_map(List.flatten(output), fn(calc) -> [calc * delta * network.learning_rate] end)
     new_weights = Matrix.sub(network.weights, gradient)
     Agent.update(__MODULE__, fn(map) -> Map.put(map, :weights, new_weights) end)
   end
 
   defp calculate(inputs, weights) do
-    pmap(Enum.zip(inputs, weights), fn(tuple) ->
+    parallel_map(Enum.zip(inputs, weights), fn(tuple) ->
       {input, weight} = {elem(tuple, 0), elem(tuple, 1)}
       Numerix.LinearAlgebra.dot_product(input, weight)
       |> Numerix.Special.logistic
       |> List.wrap
     end)
+  end
+
+  defp feed_forward(input_list) do
+    network = get()
+    calculate(input_list, network.weights) |> feed_forward(network.weights, input_list)
+  end
+
+  defp feed_forward(outputs, old_weights, inputs) do
+    final_outputs = calculate(outputs, old_weights)
+    calculate_errors(final_outputs, inputs)
   end
 
   defp calculate_errors(final_outputs, inputs) do
@@ -111,5 +121,11 @@ defmodule Deepnet.Network do
       |> Numerix.Distance.mse(List.flatten(final_outputs))
     Agent.update(__MODULE__, fn(map) -> Map.put(map, :error_rate, network_error) end)
     adjust_weights(final_outputs, inputs)    
+  end
+
+  defp parallel_map(data, calc_function) do
+    data
+    |> Enum.map(&(Task.async(fn -> calc_function.(&1) end)))
+    |> Enum.map(&Task.await/1)
   end
 end
