@@ -64,6 +64,23 @@ defmodule Deepnet.Network do
   end
   
   @doc """
+  Trains the Neural network toward the specified target.
+  # PARAMETERS
+  - `inputs`: The inputs to the neural network. List.T()
+  - `target`: The goal for the network to acheive. List.T()
+  """
+  def train(inputs, target) when is_list(inputs) and is_list(target) do
+    {input_list, target_list} = {
+      parallel_map(inputs, &List.wrap/1), 
+      parallel_map(target, &List.wrap/1)
+    }
+    Agent.get_and_update(__MODULE__, fn(map) ->
+      {map, Map.put(map, :target, target_list)}
+    )
+    feed_forward(input_list)
+  end
+
+  @doc """
   Get state of neural network
   """
   def get do
