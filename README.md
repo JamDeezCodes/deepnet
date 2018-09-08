@@ -25,10 +25,8 @@ To fire up the neural network, run:
 
 ```iex -S mix```
 
-Then run this command to initialize the weights:
+Then run this command to start the neural network:
 
-```Deepnet.Network.initialize_weights```
+```Deepnet.learn```
 
-When you run the following command, you should see the network's randomized weights in the struct:
-
-```Deepnet.Network.get```
+The network should then print the epoch and error rate until the desired target is reached.
