@@ -76,7 +76,7 @@ defmodule Deepnet.Network do
     }
     Agent.get_and_update(__MODULE__, fn(map) ->
       {map, Map.put(map, :target, target_list)}
-    )
+    end)
     feed_forward(input_list)
   end
 
@@ -101,7 +101,7 @@ defmodule Deepnet.Network do
     end)
   end
 
-  defp adjust_weights(output, inputs) do
+  defp adjust_weights(output, input) do
     network = get()
     delta =
       Matrix.sub(output, network.target)
