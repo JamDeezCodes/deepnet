@@ -95,6 +95,15 @@ defmodule Deepnet.Network do
     Agent.update(__MODULE__, fn(map) -> Map.put(map, :weights, new_weights) end)
   end
 
+  defp calculate(inputs, weights) do
+    pmap(Enum.zip(inputs, weights), fn(tuple) ->
+      {input, weight} = {elem(tuple, 0), elem(tuple, 1)}
+      Numerix.LinearAlgebra.dot_product(input, weight)
+      |> Numerix.Special.logistic
+      |> List.wrap
+    end)
+  end
+
   defp calculate_errors(final_outputs, inputs) do
     network_error = 
       Map.fetch!(get(), :target)
