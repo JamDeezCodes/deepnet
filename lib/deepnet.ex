@@ -27,14 +27,24 @@ defmodule Deepnet do
     Supervisor.start_link(children, opts)
   end
 
-  defp learn(error_rate, data, epoch) when error_rate <= 0.02 do
+  @doc """
+  Entry Point into the neural network. Starts the training and learning process.
+  """
+  def learn() do
+    Deepnet.Network.initialize_weights()
+    data = %Deepnet{}
+    Deepnet.Network.train(data.user_input, data.desired_target)
+    learn(Map.fetch!(Deepnet.Network.get(), :error_rate), data,  0)
+  end
+
+  defp learn(error_rate, data, epoch) when error_rate >= 0.02 do
     Deepnet.Network.train(data.user_input, data.desired_target)
     error_rate = Map.fetch!(Deepnet.Network.get(), :error_rate)
     IO.puts("#{IO.ANSI.yellow} | EPOCH: #{epoch + 1} | ERROR RATE: #{error_rate}")
     learn(error_rate, data, epoch + 1)
   end
 
-  defp learn(error_rate, data, epoch) when error_rate >= 0.02 do
+  defp learn(error_rate, data, epoch) when error_rate <= 0.02 do
     IO.puts("""
       #{IO.ANSI.green}
       Learned to achieve target #{inspect(data.desired_target)} in #{epoch} epochs.
